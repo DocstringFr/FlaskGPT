@@ -3,27 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <title>DocGPT</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/style.css') }}">
+    <script src="https://unpkg.com/showdown/dist/showdown.min.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
+    <script src="{{ url_for('static', filename='dist/js/script.js') }}"></script>
 </head>
 <body>
 
-<div class="mx-auto max-w-6xl py-20">
-    <form hx-post="/result"
-          hx-target="#result"
-          method="POST">
-        <label for="prompt" class="sr-only">Prompt</label>
-        <input type="prompt" name="prompt" id="prompt"
-               class="block px-4 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-               placeholder="Entrez votre requête...">
-        <button class="bg-red-600" type="submit">Envoyer</button>
-    </form>
-    <p id="result">
-
-    </p>
+<div id="chat-template" class="hidden odd:bg-slate-50 even:bg-slate-200 p-6">
+    <p class="info"></p>
 </div>
 
+<main class="mx-auto max-w-6xl py-10 min-h-screen flex flex-col">
+    <div id="gpt-output"></div>
+    <form id="prompt-form" class="mt-auto">
+        <label for="prompt" class="sr-only">Prompt</label>
+        <div>
+            <label for="prompt" class="sr-only">User Prompt</label>
+            <div class="relative mt-2 rounded-md shadow-sm">
+                <input type="text" name="prompt" id="prompt"
+                       class="block w-full rounded-md border-0 py-2.5 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                       placeholder="Send a message">
+                <button class="btn-primary absolute inset-y-0 right-0 flex items-center pr-3">
+                    <svg class="hidden" id="spinner-icon" width="24" height="24" fill="#fff" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <style>.spinner_b2T7 {
+                            animation: spinner_xe7Q .8s linear infinite
+                        }
+
+                        .spinner_YRVV {
+                            animation-delay: -.65s
+                        }
+
+                        .spinner_c9oY {
+                            animation-delay: -.5s
+                        }
+
+                        @keyframes spinner_xe7Q {
+                            93.75%, 100% {
+                                r: 3px
+                            }
+                            46.875% {
+                                r: .2px
+                            }
+                        }</style>
+                        <circle class="spinner_b2T7" cx="4" cy="12" r="3"/>
+                        <circle class="spinner_b2T7 spinner_YRVV" cx="12" cy="12" r="3"/>
+                        <circle class="spinner_b2T7 spinner_c9oY" cx="20" cy="12" r="3"/>
+                    </svg>
+                    <svg id="send-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" class="h-4 w-4 m-1 md:m-0" stroke-width="2">
+                        <path d="M.5 1.163A1 1 0 0 1 1.97.28l12.868 6.837a1 1 0 0 1 0 1.766L1.969 15.72A1 1 0 0 1 .5 14.836V10.33a1 1 0 0 1 .816-.983L8.5 8 1.316 6.653A1 1 0 0 1 .5 5.67V1.163Z"
+                              fill="currentColor"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </form>
+</main>
 
 </body>
 </html>
