@@ -2,18 +2,16 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>DocGPT</title>
+    <title>FlaskGPT</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/style.css') }}">
     <script src="https://unpkg.com/showdown/dist/showdown.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/highlight.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.2.0/styles/default.min.css">
-    <script src="{{ url_for('static', filename='dist/js/script.js') }}"></script>
 </head>
 <body>
 
 <div id="chat-template" class="hidden odd:bg-slate-50 even:bg-slate-200 p-6">
-    <p class="info"></p>
+    <p class="message"></p>
 </div>
 
 <main class="mx-auto max-w-6xl py-10 min-h-screen flex flex-col">
@@ -24,7 +22,7 @@
             <label for="prompt" class="sr-only">User Prompt</label>
             <div class="relative mt-2 rounded-md shadow-sm">
                 <input type="text" name="prompt" id="prompt"
-                       class="block w-full rounded-md border-0 py-2.5 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                       class="block w-full rounded-md border-0 py-2.5 pl-4 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                        placeholder="Send a message">
                 <button class="btn-primary absolute inset-y-0 right-0 flex items-center pr-3">
                     <svg class="hidden" id="spinner-icon" width="24" height="24" fill="#fff" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -62,5 +60,6 @@
     </form>
 </main>
 
+<script src="{{ url_for('static', filename='dist/js/script.js') }}"></script>
 </body>
 </html>

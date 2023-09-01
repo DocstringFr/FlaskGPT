@@ -1,68 +1,87 @@
-function cloneAnswerBlock() {
-    let output = document.querySelector("#gpt-output");
-    let template = document.querySelector('#chat-template');
-    let clone = template.cloneNode(true);
+function _cloneAnswerBlock() {
+    const output = document.querySelector("#gpt-output");
+    const template = document.querySelector('#chat-template');
+    const clone = template.cloneNode(true);
     clone.id = "";
     output.appendChild(clone);
     clone.classList.remove("hidden")
-    return clone.querySelector(".info");
+    return clone.querySelector(".message");
 }
 
 function addToLog(message) {
-    let infoBlock = cloneAnswerBlock();
+    const infoBlock = _cloneAnswerBlock();
+
+    if (!infoBlock) {
+        console.error("Échec de la création du bloc d'information");
+        return null;
+    }
+
     infoBlock.innerText = message;
     return infoBlock;
 }
 
 function getChatHistory() {
-    let messages = [];
-    let infoBlocks = document.querySelectorAll(".info");
-    infoBlocks.forEach((block) => {
-        messages.push(block.innerHTML);
-    });
+    const infoBlocks = document.querySelectorAll(".message:not(#chat-template .message)");
 
-    messages.shift();
-    return messages;
+    if (!infoBlocks.length) {
+        console.warn('Aucun bloc d\'information trouvé');
+        return [];
+    }
+
+    return Array.from(infoBlocks).map(block => block.innerHTML);
 }
 
-// when document finished loading
+
+async function fetchPromptResponse(prompt) {
+    const response = await fetch("/prompt", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({messages: getChatHistory()}),
+    });
+
+    return response.body.getReader();
+}
+
+async function readResponseChunks(reader, gptOutput) {
+    const decoder = new TextDecoder();
+    const converter = new showdown.Converter();
+
+    let chunks = "";
+    while (true) {
+        const {done, value} = await reader.read();
+        if (done) {
+            break;
+        }
+        chunks += decoder.decode(value);
+        gptOutput.innerHTML = converter.makeHtml(chunks);
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.querySelector("#prompt-form");
     const spinnerIcon = document.querySelector("#spinner-icon");
     const sendIcon = document.querySelector("#send-icon");
-    const decoder = new TextDecoder();
-    let converter = new showdown.Converter()
 
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
         spinnerIcon.classList.remove("hidden");
         sendIcon.classList.add("hidden");
 
-        let prompt = form.elements.prompt.value;
+        const prompt = form.elements.prompt.value;
         addToLog(prompt);
 
-        const response = await fetch("/prompt", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({messages: getChatHistory()}),
-        });
-
-        const reader = response.body.getReader();
-        let chunks = "";
-
-        let gptOutput = addToLog("GPT est en train de réfléchir...");
-
-        while (true) {
-            const {done, value} = await reader.read();
-            if (done) {break;}
-            chunks += decoder.decode(value);
-            gptOutput.innerHTML = converter.makeHtml(chunks);
+        try {
+            const gptOutput = addToLog("GPT est en train de réfléchir...");
+            const reader = await fetchPromptResponse(prompt);
+            await readResponseChunks(reader, gptOutput);
+        } catch (error) {
+            console.error('Une erreur est survenue:', error);
+        } finally {
+            spinnerIcon.classList.add("hidden");
+            sendIcon.classList.remove("hidden");
+            hljs.highlightAll();
         }
-
-        spinnerIcon.classList.add("hidden");
-        sendIcon.classList.remove("hidden");
-        hljs.highlightAll();
     });
 });
