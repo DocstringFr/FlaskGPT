@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>FlaskGPT</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/style.css') }}">
     <script src="https://unpkg.com/showdown/dist/showdown.min.js"></script>
@@ -14,7 +15,7 @@
     <p class="message"></p>
 </div>
 
-<main class="mx-auto max-w-6xl py-10 min-h-screen flex flex-col">
+<main class="mx-auto max-w-6xl px-4 py-10 min-h-screen flex flex-col">
     <div id="gpt-output"></div>
     <form id="prompt-form" class="mt-auto">
         <label for="prompt" class="sr-only">Prompt</label>
